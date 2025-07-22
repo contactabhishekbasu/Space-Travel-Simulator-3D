@@ -54,7 +54,7 @@ button.active {
     background: #2563eb;
 }
 
-#speed-control {
+#speed-control, #scale-control {
     margin: 20px 0;
 }
 
@@ -78,6 +78,12 @@ button.active {
 
 input[type="range"] {
     width: 100%;
+}
+
+#scale-control label, #speed-control label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
 }
 
 .planet-info {
