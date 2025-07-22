@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Travel Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        
+        #canvas {
+            display: block;
+            background: #000;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            max-width: 300px;
+        }
+        
+        button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a6578;
+        }
+        
+        button.active {
+            background: #2563eb;
+        }
+        
+        #speed-control {
+            margin: 20px 0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .planet-info {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        #distance {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+        }
+        
+        #loading-indicator {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-bottom: 10px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="controls">
+        <h3>Space Navigation</h3>
+        <button id="btn-blackhole">Black Hole (Sagittarius A*)</button>
+        <button id="btn-sun">Sun</button>
+        <button id="btn-mercury">Mercury</button>
+        <button id="btn-venus">Venus</button>
+        <button id="btn-earth">Earth</button>
+        <button id="btn-moon">Moon</button>
+        <button id="btn-iss">ISS</button>
+        <button id="btn-mars">Mars</button>
+        <button id="btn-jupiter">Jupiter</button>
+        <button id="btn-saturn">Saturn</button>
+        <button id="btn-uranus">Uranus</button>
+        <button id="btn-neptune">Neptune</button>
+        
+        <div id="speed-control">
+            <label>Travel Speed: <span id="speed-label">1x</span></label>
+            <input type="range" id="speed-slider" min="1" max="100" value="1">
+        </div>
+        
+        <div id="distance"></div>
+    </div>
+    
+    <div id="info">
+        <h3 id="destination-name">Welcome to Space</h3>
+        <div class="planet-info" id="planet-info">
+            <div id="loading-indicator">Loading planets... Please wait.</div>
+            Click on any celestial body to travel there and learn about it!
+            <br><br>
+            <strong>New Features:</strong>
+            <br>• 🌙 Moon orbiting Earth
+            <br>• 🛸 ISS circling our planet
+            <br>• 🌓 Day/Night terminator
+            <br>• 🌌 Aurora at Earth's poles
+            <br>• 🌍 Realistic planet textures
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Include inline for simplicity - in production, this would be in js/space-simulator.js
+        ${space_simulator_content}
+    </script>
+</body>
+</html>
