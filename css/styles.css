@@ -58,6 +58,24 @@ button.active {
     margin: 20px 0;
 }
 
+#orbit-control {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+#orbit-control label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+#orbit-control input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
 input[type="range"] {
     width: 100%;
 }
