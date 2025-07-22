@@ -1,6 +1,6 @@
 // Scene setup
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 50000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -17,9 +17,9 @@ const starsGeometry = new THREE.BufferGeometry();
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
 const starsVertices = [];
 for (let i = 0; i < 10000; i++) {
-    const x = (Math.random() - 0.5) * 2000;
-    const y = (Math.random() - 0.5) * 2000;
-    const z = (Math.random() - 0.5) * 2000;
+    const x = (Math.random() - 0.5) * 10000;
+    const y = (Math.random() - 0.5) * 10000;
+    const z = (Math.random() - 0.5) * 10000;
     starsVertices.push(x, y, z);
 }
 starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
@@ -48,11 +48,14 @@ function loadTexture(url, fallbackColor) {
     });
 }
 
-// Celestial bodies data
+// Scale factor: 1 AU (Astronomical Unit) = 100 units in our scene
+const AU_SCALE = 100;
+
+// Celestial bodies data with realistic distances and orbital data
 const celestialBodies = {
     blackhole: {
         name: "Sagittarius A* (Black Hole)",
-        position: new THREE.Vector3(-500, 0, -500),
+        position: new THREE.Vector3(-2600, 0, -2600), // Far away from solar system
         size: 30,
         color: 0x000000,
         emissive: 0x400040,
@@ -70,81 +73,97 @@ const celestialBodies = {
     },
     mercury: {
         name: "Mercury",
-        position: new THREE.Vector3(40, 0, 0),
-        size: 4,
+        position: new THREE.Vector3(0.39 * AU_SCALE, 0, 0), // 0.39 AU from Sun
+        size: 2,
         color: 0x8b7355,
+        orbitRadius: 0.39 * AU_SCALE,
+        orbitSpeed: 0.004, // Fastest orbit
         info: "The smallest planet and closest to the Sun. Day length: 59 Earth days. No atmosphere. Temperature: -173°C to 427°C.",
         educational: "Mercury demonstrates extreme temperature variations and the effects of minimal atmosphere."
     },
     venus: {
         name: "Venus",
-        position: new THREE.Vector3(70, 0, 20),
-        size: 8,
+        position: new THREE.Vector3(0.72 * AU_SCALE, 0, 0), // 0.72 AU from Sun
+        size: 4,
         color: 0xffd700,
+        orbitRadius: 0.72 * AU_SCALE,
+        orbitSpeed: 0.0015,
         info: "The hottest planet due to greenhouse effect. Atmosphere: 96.5% CO2. Surface pressure: 90x Earth's. Rotates backwards.",
         educational: "Venus is a perfect example of runaway greenhouse effect - crucial for climate science education."
     },
     earth: {
         name: "Earth",
-        position: new THREE.Vector3(100, 0, 0),
-        size: 8,
+        position: new THREE.Vector3(1.0 * AU_SCALE, 0, 0), // 1.0 AU from Sun (definition of AU)
+        size: 4,
         color: 0x0066cc,
+        orbitRadius: 1.0 * AU_SCALE,
+        orbitSpeed: 0.001,
         info: "Our home planet. The only known planet with life. 71% water coverage. Perfect distance from Sun for liquid water. Has one natural satellite: the Moon.",
         educational: "Earth sciences encompass geology, meteorology, oceanography, and environmental studies."
     },
     moon: {
         name: "The Moon",
-        position: new THREE.Vector3(100, 0, 0), // Will be updated dynamically
-        size: 2,
+        position: new THREE.Vector3(1.0 * AU_SCALE, 0, 0), // Will be updated dynamically
+        size: 1,
         color: 0xaaaaaa,
         info: "Earth's only natural satellite. Formed 4.5 billion years ago. Responsible for ocean tides. Distance from Earth: 384,400 km.",
         educational: "The Moon teaches us about tidal forces, orbital mechanics, and the history of our solar system."
     },
     iss: {
         name: "International Space Station (ISS)",
-        position: new THREE.Vector3(100, 0, 0), // Will be updated dynamically
-        size: 0.2,
+        position: new THREE.Vector3(1.0 * AU_SCALE, 0, 0), // Will be updated dynamically
+        size: 0.1,
         color: 0xffffff,
         info: "Humanity's permanent outpost in space. Orbits Earth every 90 minutes at 408 km altitude. Home to astronauts from many nations.",
         educational: "The ISS demonstrates international cooperation, microgravity research, and human adaptation to space."
     },
     mars: {
         name: "Mars",
-        position: new THREE.Vector3(140, 0, -20),
-        size: 6,
+        position: new THREE.Vector3(1.52 * AU_SCALE, 0, 0), // 1.52 AU from Sun
+        size: 3,
         color: 0xcd5c5c,
+        orbitRadius: 1.52 * AU_SCALE,
+        orbitSpeed: 0.00053,
         info: "The Red Planet. Has the largest volcano (Olympus Mons) and canyon (Valles Marineris) in the solar system. Two moons: Phobos and Deimos.",
         educational: "Mars exploration teaches robotics, astrobiology, and potential human colonization challenges."
     },
     jupiter: {
         name: "Jupiter",
-        position: new THREE.Vector3(250, 0, 50),
-        size: 18,
+        position: new THREE.Vector3(5.2 * AU_SCALE, 0, 0), // 5.2 AU from Sun
+        size: 11,
         color: 0xdaa520,
+        orbitRadius: 5.2 * AU_SCALE,
+        orbitSpeed: 0.00008,
         info: "The largest planet. A gas giant with 79+ moons. Great Red Spot is a storm larger than Earth. Protects inner planets from asteroids.",
         educational: "Jupiter demonstrates gas giant composition, powerful magnetospheres, and gravitational influences."
     },
     saturn: {
         name: "Saturn",
-        position: new THREE.Vector3(350, 0, -30),
-        size: 16,
+        position: new THREE.Vector3(9.54 * AU_SCALE, 0, 0), // 9.54 AU from Sun
+        size: 9,
         color: 0xf4a460,
+        orbitRadius: 9.54 * AU_SCALE,
+        orbitSpeed: 0.00003,
         info: "Famous for its rings made of ice and rock. Less dense than water. 82+ moons including Titan with thick atmosphere.",
         educational: "Saturn's rings teach us about gravitational dynamics and moon formation."
     },
     uranus: {
         name: "Uranus",
-        position: new THREE.Vector3(450, 0, 80),
-        size: 12,
+        position: new THREE.Vector3(19.19 * AU_SCALE, 0, 0), // 19.19 AU from Sun
+        size: 4,
         color: 0x40e0d0,
+        orbitRadius: 19.19 * AU_SCALE,
+        orbitSpeed: 0.00001,
         info: "Tilted 98° - rolls on its side. Coldest planetary atmosphere. Has faint rings. Discovered by William Herschel in 1781.",
         educational: "Uranus shows how planetary collisions can dramatically alter rotation and magnetic fields."
     },
     neptune: {
         name: "Neptune",
-        position: new THREE.Vector3(550, 0, -60),
-        size: 12,
+        position: new THREE.Vector3(30.07 * AU_SCALE, 0, 0), // 30.07 AU from Sun
+        size: 4,
         color: 0x0000cd,
+        orbitRadius: 30.07 * AU_SCALE,
+        orbitSpeed: 0.000006,
         info: "Windiest planet with speeds up to 2,100 km/h. Deep blue from methane. Has 14 known moons including Triton.",
         educational: "Neptune helps us understand atmospheric dynamics and the outer solar system's formation."
     }
@@ -152,11 +171,43 @@ const celestialBodies = {
 
 // Create celestial bodies
 const bodies = {};
+const orbits = {};
+let orbitsVisible = true;
+
+// Orbital angles for each planet
+const orbitAngles = {};
+
+// Create orbit paths
+function createOrbitPath(radius, segments = 128) {
+    const points = [];
+    for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(
+            Math.cos(angle) * radius,
+            0,
+            Math.sin(angle) * radius
+        ));
+    }
+    
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: 0x444444,
+        transparent: true,
+        opacity: 0.3
+    });
+    
+    return new THREE.Line(geometry, material);
+}
 
 // Create all celestial bodies asynchronously to handle texture loading
 async function createCelestialBodies() {
     for (const [key, data] of Object.entries(celestialBodies)) {
         let mesh;
+        
+        // Initialize orbit angle
+        if (data.orbitRadius) {
+            orbitAngles[key] = Math.random() * Math.PI * 2; // Random starting position
+        }
         
         if (key === 'earth') {
             // Create Earth with realistic textures
@@ -259,6 +310,7 @@ async function createCelestialBodies() {
             const atmosphereMesh = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
             atmosphereMesh.position.copy(data.position);
             scene.add(atmosphereMesh);
+            bodies[key + '_atmosphere'] = atmosphereMesh;
             
             // Add day/night shader
             const dayNightGeometry = new THREE.SphereGeometry(data.size * 0.99, 64, 64);
@@ -526,6 +578,13 @@ async function createCelestialBodies() {
             rings.rotation.x = Math.PI / 2;
             mesh.add(rings);
         }
+        
+        // Create orbit path for planets
+        if (data.orbitRadius && key !== 'moon' && key !== 'iss') {
+            const orbit = createOrbitPath(data.orbitRadius);
+            scene.add(orbit);
+            orbits[key] = orbit;
+        }
     }
     
     // Hide loading indicator
@@ -536,10 +595,10 @@ async function createCelestialBodies() {
     
     // Initial travel sequence
     setTimeout(() => {
-        travelTo('blackhole');
+        travelTo('sun');
         setTimeout(() => {
             travelTo('earth');
-        }, 3000);
+        }, 2000);
     }, 500);
 }
 
@@ -584,8 +643,12 @@ function travelTo(destination) {
         targetPosition.add(new THREE.Vector3(5, 2, 5)); // Much closer for ISS
     } else if (destination === 'moon') {
         targetPosition.add(new THREE.Vector3(20, 10, 20)); // Medium distance for Moon
+    } else if (destination === 'sun') {
+        targetPosition.add(new THREE.Vector3(100, 50, 100)); // Further for Sun
+    } else if (['jupiter', 'saturn', 'uranus', 'neptune'].includes(destination)) {
+        targetPosition.add(new THREE.Vector3(80, 40, 80)); // Further for outer planets
     } else {
-        targetPosition.add(new THREE.Vector3(50, 30, 50)); // Standard distance for planets
+        targetPosition.add(new THREE.Vector3(50, 30, 50)); // Standard distance for inner planets
     }
     
     isMoving = true;
@@ -613,6 +676,15 @@ speedSlider.addEventListener('input', (e) => {
     speedLabel.textContent = currentSpeed + 'x';
 });
 
+// Orbit toggle
+const orbitToggle = document.getElementById('orbit-toggle');
+orbitToggle.addEventListener('change', (e) => {
+    orbitsVisible = e.target.checked;
+    Object.values(orbits).forEach(orbit => {
+        orbit.visible = orbitsVisible;
+    });
+});
+
 // Animation variables
 let moonAngle = 0;
 let issAngle = 0;
@@ -622,22 +694,41 @@ let auroraTime = 0;
 function animate() {
     requestAnimationFrame(animate);
     
+    // Update planet positions based on orbits
+    Object.entries(celestialBodies).forEach(([key, data]) => {
+        if (data.orbitRadius && data.orbitSpeed && bodies[key]) {
+            orbitAngles[key] += data.orbitSpeed;
+            const x = Math.cos(orbitAngles[key]) * data.orbitRadius;
+            const z = Math.sin(orbitAngles[key]) * data.orbitRadius;
+            bodies[key].position.set(x, 0, z);
+            
+            // Update associated objects for Earth
+            if (key === 'earth') {
+                if (bodies.earth_clouds) bodies.earth_clouds.position.set(x, 0, z);
+                if (bodies.earth_atmosphere) bodies.earth_atmosphere.position.set(x, 0, z);
+                if (bodies.earth_daynight) bodies.earth_daynight.position.set(x, 0, z);
+                if (bodies.earth_aurora_north) bodies.earth_aurora_north.position.set(x, 0, z);
+                if (bodies.earth_aurora_south) bodies.earth_aurora_south.position.set(x, 0, z);
+            }
+        }
+    });
+    
     // Update Moon orbit around Earth
     if (bodies.moon && bodies.earth) {
         moonAngle += 0.01;
-        const moonDistance = 15;
+        const moonDistance = 8; // Scaled down for visibility
         bodies.moon.position.x = bodies.earth.position.x + Math.cos(moonAngle) * moonDistance;
         bodies.moon.position.z = bodies.earth.position.z + Math.sin(moonAngle) * moonDistance;
-        bodies.moon.position.y = bodies.earth.position.y + Math.sin(moonAngle * 0.1) * 2; // Slight inclination
+        bodies.moon.position.y = bodies.earth.position.y + Math.sin(moonAngle * 0.1) * 1; // Slight inclination
     }
     
     // Update ISS orbit around Earth
     if (bodies.iss && bodies.earth) {
         issAngle += 0.03; // Faster orbit (90 minutes)
-        const issDistance = 9;
+        const issDistance = 4.5; // Very close to Earth
         bodies.iss.position.x = bodies.earth.position.x + Math.cos(issAngle) * issDistance;
         bodies.iss.position.z = bodies.earth.position.z + Math.sin(issAngle) * issDistance;
-        bodies.iss.position.y = bodies.earth.position.y + Math.sin(issAngle * 2) * 1; // Slight inclination
+        bodies.iss.position.y = bodies.earth.position.y + Math.sin(issAngle * 2) * 0.5; // Slight inclination
         
         // Make ISS always face Earth
         bodies.iss.lookAt(bodies.earth.position);
@@ -645,8 +736,8 @@ function animate() {
     
     // Update day/night cycle
     if (bodies.earth_daynight) {
-        const sunDir = new THREE.Vector3(1, 0, 0).normalize();
-        bodies.earth_daynight.material.uniforms.sunDirection.value = sunDir;
+        const earthToSun = new THREE.Vector3().subVectors(bodies.sun.position, bodies.earth.position).normalize();
+        bodies.earth_daynight.material.uniforms.sunDirection.value = earthToSun;
         bodies.earth_daynight.rotation.y = bodies.earth.rotation.y;
     }
     
@@ -709,7 +800,7 @@ function animate() {
             body.rotation.y += 0.002; // Moon tidally locked (slower rotation)
         } else if (key === 'iss') {
             // ISS rotation handled above
-        } else if (!key.includes('_clouds') && !key.includes('_daynight') && !key.includes('_aurora')) {
+        } else if (!key.includes('_clouds') && !key.includes('_daynight') && !key.includes('_aurora') && !key.includes('_atmosphere')) {
             body.rotation.y += 0.01;
         }
     });
