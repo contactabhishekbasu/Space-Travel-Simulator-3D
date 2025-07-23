@@ -166,6 +166,19 @@ class SettingsPanel {
                 label: 'Dev Console', 
                 category: 'ui',
                 description: 'Show/hide the developer console for debugging information'
+            },
+            
+            // Developer settings
+            dashboardType: { 
+                enabled: 'performance', 
+                label: 'Dashboard Type', 
+                category: 'developer',
+                description: 'Choose between Performance Dashboard or the new Quantum Analytics Dashboard',
+                type: 'select',
+                options: [
+                    { value: 'performance', label: 'Performance Dashboard' },
+                    { value: 'quantum', label: 'Quantum Dashboard' }
+                ]
             }
         };
         
@@ -243,7 +256,8 @@ class SettingsPanel {
         container.style.cssText = `
             position: fixed;
             top: 60px;
-            left: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 350px;
             max-height: 80vh;
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95));
@@ -278,7 +292,8 @@ class SettingsPanel {
             sun: 'Sun Effects',
             objects: 'Space Objects',
             special: 'Special Features',
-            ui: 'UI Elements'
+            ui: 'UI Elements',
+            developer: 'Developer Tools'
         };
         
         Object.entries(categories).forEach(([categoryKey, categoryLabel]) => {
@@ -311,29 +326,43 @@ class SettingsPanel {
         
         // Add close button
         const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '×';
+        closeBtn.innerHTML = '✕';
         closeBtn.style.cssText = `
             position: absolute;
-            right: 10px;
-            top: 10px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            width: 30px;
-            height: 30px;
+            right: 15px;
+            top: 15px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.2));
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 20px;
             transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            line-height: 1;
+            padding: 0;
         `;
         closeBtn.addEventListener('click', () => this.hide());
         closeBtn.addEventListener('mouseenter', () => {
-            closeBtn.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+            closeBtn.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.4))';
+            closeBtn.style.border = '2px solid rgba(239, 68, 68, 0.6)';
+            closeBtn.style.color = '#ffffff';
             closeBtn.style.transform = 'scale(1.1)';
+            closeBtn.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
         });
         closeBtn.addEventListener('mouseleave', () => {
-            closeBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            closeBtn.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.2))';
+            closeBtn.style.border = '2px solid rgba(239, 68, 68, 0.3)';
+            closeBtn.style.color = '#fca5a5';
             closeBtn.style.transform = 'scale(1)';
+            closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
         });
         container.appendChild(closeBtn);
         
@@ -391,6 +420,95 @@ class SettingsPanel {
             div.style.borderColor = 'rgba(71, 85, 105, 0.3)';
             div.style.transform = 'translateY(0)';
         });
+        
+        // Handle select dropdown type
+        if (setting.type === 'select') {
+            const label = document.createElement('div');
+            label.textContent = setting.label;
+            label.style.cssText = `
+                color: #e0e7ff;
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            `;
+            div.appendChild(label);
+            
+            const select = document.createElement('select');
+            select.style.cssText = `
+                width: 100%;
+                padding: 8px 12px;
+                background: rgba(30, 41, 59, 0.8);
+                border: 1px solid rgba(100, 116, 139, 0.5);
+                border-radius: 8px;
+                color: #e0e7ff;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                outline: none;
+            `;
+            
+            // Add options
+            setting.options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.textContent = option.label;
+                opt.disabled = option.disabled || false;
+                if (setting.enabled === option.value) {
+                    opt.selected = true;
+                }
+                opt.style.background = '#1e293b';
+                select.appendChild(opt);
+            });
+            
+            // Handle change event
+            select.addEventListener('change', (e) => {
+                setting.enabled = e.target.value;
+                if (this.connector) {
+                    this.connector.notifyChange(key, e.target.value);
+                }
+                if (window.devLog) {
+                    window.devLog.info(`Dashboard type changed to: ${e.target.value}`);
+                }
+                
+                // Handle dashboard type changes
+                if (key === 'dashboardType' && e.target.value === 'quantum') {
+                    this.launchQuantumDashboard();
+                    // Reset to performance dashboard after launching
+                    setTimeout(() => {
+                        e.target.value = 'performance';
+                        setting.enabled = 'performance';
+                    }, 100);
+                }
+            });
+            
+            // Add hover effects
+            select.addEventListener('mouseenter', () => {
+                select.style.borderColor = 'rgba(99, 102, 241, 0.6)';
+                select.style.background = 'rgba(51, 65, 85, 0.8)';
+            });
+            
+            select.addEventListener('mouseleave', () => {
+                select.style.borderColor = 'rgba(100, 116, 139, 0.5)';
+                select.style.background = 'rgba(30, 41, 59, 0.8)';
+            });
+            
+            div.appendChild(select);
+            
+            // Add description
+            if (setting.description) {
+                const desc = document.createElement('div');
+                desc.textContent = setting.description;
+                desc.style.cssText = `
+                    color: #94a3b8;
+                    font-size: 12px;
+                    margin-top: 8px;
+                    line-height: 1.4;
+                `;
+                div.appendChild(desc);
+            }
+            
+            return div;
+        }
         
         // Top row: label and toggle
         const topRow = document.createElement('div');
@@ -657,6 +775,105 @@ class SettingsPanel {
     hide() {
         this.container.style.display = 'none';
         this.isVisible = false;
+    }
+    
+    launchQuantumDashboard() {
+        // Check if modal already exists
+        let modal = document.getElementById('quantum-dashboard-modal');
+        if (modal) {
+            modal.classList.add('active');
+            return;
+        }
+        
+        // Create modal container
+        modal = document.createElement('div');
+        modal.id = 'quantum-dashboard-modal';
+        modal.className = 'quantum-dashboard-modal';
+        
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'quantum-dashboard-close';
+        closeBtn.innerHTML = '×';
+        closeBtn.title = 'Close Dashboard';
+        closeBtn.onclick = () => {
+            modal.classList.remove('active');
+            // Clean up iframe to free resources
+            const iframe = modal.querySelector('iframe');
+            if (iframe) {
+                iframe.src = 'about:blank';
+            }
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        };
+        
+        // Create iframe
+        const iframe = document.createElement('iframe');
+        iframe.className = 'quantum-dashboard-iframe';
+        iframe.src = 'quantum-dashboard.html';
+        iframe.onload = () => {
+            if (window.devLog) {
+                window.devLog.success('Quantum Dashboard loaded successfully');
+            }
+        };
+        
+        // Create loading overlay
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'quantum-loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="quantum-loading-content">
+                <div class="quantum-loading-spinner"></div>
+                <div class="quantum-loading-text">Loading Quantum Dashboard...</div>
+            </div>
+        `;
+        
+        // Assemble modal
+        modal.appendChild(closeBtn);
+        modal.appendChild(loadingOverlay);
+        modal.appendChild(iframe);
+        document.body.appendChild(modal);
+        
+        // Show modal with animation
+        setTimeout(() => {
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }, 10);
+        
+        // Hide loading overlay when iframe loads
+        iframe.onload = () => {
+            loadingOverlay.style.display = 'none';
+            if (window.devLog) {
+                window.devLog.success('Quantum Dashboard loaded successfully');
+            }
+            
+            // Show indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'quantum-dashboard-indicator';
+            indicator.textContent = '✓ Quantum Dashboard Connected';
+            document.body.appendChild(indicator);
+            indicator.style.display = 'block';
+            
+            setTimeout(() => {
+                indicator.style.display = 'none';
+                indicator.remove();
+            }, 3000);
+        };
+        
+        // Keyboard shortcut to close (ESC)
+        const handleEsc = (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeBtn.click();
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+        
+        // Log event
+        if (window.devLog) {
+            window.devLog.info('Launching Quantum Dashboard...');
+        }
     }
     
     getSetting(key) {

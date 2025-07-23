@@ -1249,3 +1249,189 @@ input[type="range"]::-moz-range-thumb:hover {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 }
+
+/* Quantum Dashboard Integration Styles */
+.quantum-dashboard-button {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(79, 70, 229, 0.8));
+    color: #f0f9ff;
+    border: 1px solid rgba(99, 102, 241, 0.6);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), 
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+    width: 100%;
+    margin-top: 10px;
+}
+
+.quantum-dashboard-button:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(79, 70, 229, 0.9));
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4), 
+                0 0 40px rgba(99, 102, 241, 0.2),
+                inset 0 0 30px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.quantum-dashboard-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* Dashboard iframe/modal styles */
+.quantum-dashboard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quantum-dashboard-modal.active {
+    display: block;
+    opacity: 1;
+}
+
+.quantum-dashboard-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #0a0e27;
+}
+
+.quantum-dashboard-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(239, 68, 68, 0.8);
+    border: 2px solid rgba(239, 68, 68, 0.6);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10001;
+}
+
+.quantum-dashboard-close:hover {
+    background: rgba(239, 68, 68, 1);
+    border-color: rgba(239, 68, 68, 0.8);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Settings Panel Dashboard Selector Styles */
+.setting-option select[disabled] option[disabled] {
+    color: rgba(148, 163, 184, 0.5);
+    font-style: italic;
+}
+
+.setting-option select option[disabled]::after {
+    content: " (Coming Soon)";
+}
+
+.dashboard-type-selector {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    color: #e0e7ff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dashboard-type-selector:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9));
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.dashboard-type-selector:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Dashboard integration indicator */
+.quantum-dashboard-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+    display: none;
+    z-index: 1000;
+    animation: quantum-fade-in 0.5s ease;
+}
+
+@keyframes quantum-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Quantum Dashboard Loading Animation */
+.quantum-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 14, 39, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.quantum-loading-content {
+    text-align: center;
+}
+
+.quantum-loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-top-color: #60a5fa;
+    border-radius: 50%;
+    animation: quantum-spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.quantum-loading-text {
+    color: #e0e7ff;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+@keyframes quantum-spin {
+    to { transform: rotate(360deg); }
+}
