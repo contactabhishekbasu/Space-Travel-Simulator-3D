@@ -2840,36 +2840,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to open dashboard in new tab
     function openDashboardInNewTab() {
-        // Enable quantum dashboard for dev mode
-        localStorage.setItem('useQuantumDashboard', 'true');
-        devLog.info('Enabling Quantum Dashboard for dev mode');
+        // Use performance dashboard
+        devLog.info('Opening Performance Dashboard');
         
         let retryCount = 0;
         const maxRetries = 10;
         
         const tryOpenDashboard = () => {
             devLog.info('Checking dashboard dependencies...');
-            devLog.info('Dashboard Controller available:', !!window.dashboardController);
-            devLog.info('QuantumDashboard class available:', typeof QuantumDashboard !== 'undefined');
+            devLog.info('PerformanceDashboard available:', !!window.performanceDashboard);
             devLog.info('PerformanceDashboard class available:', typeof PerformanceDashboard !== 'undefined');
             
-            if (window.dashboardController && 
-                (typeof QuantumDashboard !== 'undefined' || typeof PerformanceDashboard !== 'undefined')) {
+            if (window.performanceDashboard) {
                 try {
-                    devLog.info('Opening quantum dashboard...');
-                    window.dashboardController.openDashboard();
-                    devLog.success('Quantum dashboard opened successfully');
+                    devLog.info('Opening performance dashboard...');
+                    window.performanceDashboard.show();
+                    devLog.success('Performance dashboard opened successfully');
                 } catch (error) {
                     devLog.error('Failed to open dashboard:', error);
+                }
+            } else if (typeof PerformanceDashboard !== 'undefined') {
+                try {
+                    devLog.info('Initializing performance dashboard...');
+                    window.performanceDashboard = new PerformanceDashboard();
+                    window.performanceDashboard.show();
+                    devLog.success('Performance dashboard initialized and opened');
+                } catch (error) {
+                    devLog.error('Failed to initialize dashboard:', error);
                 }
             } else {
                 // Dashboard not ready, try again
                 retryCount++;
                 if (retryCount >= maxRetries) {
                     devLog.error('Failed to open dashboard after ' + maxRetries + ' attempts');
-                    devLog.error('Dashboard Controller:', !!window.dashboardController);
-                    devLog.error('QuantumDashboard:', typeof QuantumDashboard !== 'undefined');
-                    devLog.error('PerformanceDashboard:', typeof PerformanceDashboard !== 'undefined');
+                    devLog.error('PerformanceDashboard:', !!window.performanceDashboard);
+                    devLog.error('PerformanceDashboard class:', typeof PerformanceDashboard !== 'undefined');
                     return;
                 }
                 
