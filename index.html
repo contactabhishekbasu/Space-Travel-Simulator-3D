@@ -5,35 +5,185 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Travel Simulator</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="animation-fix.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     
     <div id="controls">
         <h3>Space Navigation</h3>
-        <button id="btn-blackhole">Black Hole (Sagittarius A*)</button>
-        <button id="btn-sun">Sun</button>
-        <button id="btn-mercury">Mercury</button>
-        <button id="btn-venus">Venus</button>
-        <button id="btn-earth">Earth</button>
-        <button id="btn-moon">Moon</button>
-        <button id="btn-iss">ISS</button>
-        <button id="btn-mars">Mars</button>
-        <button id="btn-jupiter">Jupiter</button>
-        <button id="btn-saturn">Saturn</button>
-        <button id="btn-uranus">Uranus</button>
-        <button id="btn-neptune">Neptune</button>
         
-        <div id="speed-control">
-            <label>Travel Speed: <span id="speed-label">1x</span></label>
-            <input type="range" id="speed-slider" min="1" max="100" value="1">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="planets">🪐 Planets</button>
+            <button class="nav-tab" data-tab="moons">🌙 Moons</button>
+            <button class="nav-tab" data-tab="asteroids">☄️ Asteroids</button>
+            <button class="nav-tab" data-tab="spacecraft">🚀 Spacecraft</button>
+            <button class="nav-tab" data-tab="special">⭐ Special</button>
         </div>
         
-        <div id="orbit-control">
-            <label>
-                <input type="checkbox" id="orbit-toggle" checked>
-                Show Orbits
-            </label>
+        <!-- Planets Tab Content -->
+        <div class="tab-content active" data-content="planets">
+            <div class="object-grid">
+                <button id="btn-sun" class="object-card">
+                    <div class="object-icon sun"></div>
+                    <div class="object-info">
+                        <span class="object-name">Sun</span>
+                        <span class="object-type">G-type Star</span>
+                    </div>
+                </button>
+                <button id="btn-mercury" class="object-card">
+                    <div class="object-icon mercury"></div>
+                    <div class="object-info">
+                        <span class="object-name">Mercury</span>
+                        <span class="object-type">Rocky Planet</span>
+                    </div>
+                </button>
+                <button id="btn-venus" class="object-card">
+                    <div class="object-icon venus"></div>
+                    <div class="object-info">
+                        <span class="object-name">Venus</span>
+                        <span class="object-type">Rocky Planet</span>
+                    </div>
+                </button>
+                <button id="btn-earth" class="object-card">
+                    <div class="object-icon earth"></div>
+                    <div class="object-info">
+                        <span class="object-name">Earth</span>
+                        <span class="object-type">Rocky Planet</span>
+                    </div>
+                </button>
+                <button id="btn-mars" class="object-card">
+                    <div class="object-icon mars"></div>
+                    <div class="object-info">
+                        <span class="object-name">Mars</span>
+                        <span class="object-type">Rocky Planet</span>
+                    </div>
+                </button>
+                <button id="btn-jupiter" class="object-card">
+                    <div class="object-icon jupiter"></div>
+                    <div class="object-info">
+                        <span class="object-name">Jupiter</span>
+                        <span class="object-type">Gas Giant</span>
+                    </div>
+                </button>
+                <button id="btn-saturn" class="object-card">
+                    <div class="object-icon saturn"></div>
+                    <div class="object-info">
+                        <span class="object-name">Saturn</span>
+                        <span class="object-type">Gas Giant</span>
+                    </div>
+                </button>
+                <button id="btn-uranus" class="object-card">
+                    <div class="object-icon uranus"></div>
+                    <div class="object-info">
+                        <span class="object-name">Uranus</span>
+                        <span class="object-type">Ice Giant</span>
+                    </div>
+                </button>
+                <button id="btn-neptune" class="object-card">
+                    <div class="object-icon neptune"></div>
+                    <div class="object-info">
+                        <span class="object-name">Neptune</span>
+                        <span class="object-type">Ice Giant</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Moons Tab Content -->
+        <div class="tab-content" data-content="moons">
+            <div class="object-grid" id="moons-grid">
+                <button id="btn-moon" class="object-card">
+                    <div class="object-icon moon"></div>
+                    <div class="object-info">
+                        <span class="object-name">The Moon</span>
+                        <span class="object-type">Earth's Moon</span>
+                    </div>
+                </button>
+                <!-- Additional moons will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Asteroids Tab Content -->
+        <div class="tab-content" data-content="asteroids">
+            <div class="object-grid" id="asteroids-grid">
+                <!-- Asteroids will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Spacecraft Tab Content -->
+        <div class="tab-content" data-content="spacecraft">
+            <div class="object-grid" id="spacecraft-grid">
+                <!-- Spacecraft will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Special Objects Tab Content -->
+        <div class="tab-content" data-content="special">
+            <div class="object-grid">
+                <button id="btn-blackhole" class="object-card">
+                    <div class="object-icon blackhole"></div>
+                    <div class="object-info">
+                        <span class="object-name">Sagittarius A*</span>
+                        <span class="object-type">Supermassive Black Hole</span>
+                    </div>
+                </button>
+                <!-- Additional special objects will be added here -->
+            </div>
+        </div>
+        
+        <!-- Visual Control Grid -->
+        <div class="control-grid">
+            <button id="orbit-toggle" class="control-button active" data-control="orbits">
+                <div class="control-icon orbit-icon"></div>
+                <span>Orbits</span>
+            </button>
+            
+            <button id="labels-toggle" class="control-button active" data-control="labels">
+                <div class="control-icon labels-icon"></div>
+                <span>Labels</span>
+            </button>
+            
+            <button id="trails-toggle" class="control-button" data-control="trails">
+                <div class="control-icon trails-icon"></div>
+                <span>Trails</span>
+            </button>
+            
+            <button id="moons-toggle" class="control-button active" data-control="moons">
+                <div class="control-icon moons-icon"></div>
+                <span>Moons</span>
+            </button>
+            
+            <button id="asteroids-toggle" class="control-button active" data-control="asteroids">
+                <div class="control-icon asteroids-icon"></div>
+                <span>Asteroids</span>
+            </button>
+            
+            <button id="spacecraft-toggle" class="control-button active" data-control="spacecraft">
+                <div class="control-icon spacecraft-icon"></div>
+                <span>Spacecraft</span>
+            </button>
+            
+            <button id="atmospheres-toggle" class="control-button active" data-control="atmospheres">
+                <div class="control-icon atmospheres-icon"></div>
+                <span>Atmosphere</span>
+            </button>
+            
+            <button id="btn-overview" class="control-button cinematic" data-control="overview">
+                <div class="control-icon overview-icon"></div>
+                <span>Overview</span>
+            </button>
+            
+            <button id="measurements-toggle" class="control-button" data-control="measurements">
+                <div class="control-icon measurements-icon"></div>
+                <span>Measure</span>
+            </button>
+            
+            <button id="dwarf-comets-toggle" class="control-button active" data-control="dwarf-comets">
+                <div class="control-icon dwarf-comets-icon"></div>
+                <span>Dwarf/Comets</span>
+            </button>
         </div>
         
         <div id="scale-control">
@@ -42,6 +192,15 @@
         </div>
         
         <div id="distance"></div>
+        <div id="camera-mode">📷 Free Camera (ESC to exit follow mode)</div>
+        <div id="camera-shortcuts" style="font-size: 11px; color: #888; margin-top: 5px;">
+            H: Home view | F: Frame object | R: Reset orientation
+        </div>
+        
+        <!-- Enhanced Dashboard Button -->
+        <button id="enhanced-dashboard-btn" onclick="window.open('enhanced-dashboard.html', '_blank')">
+            🚀 Launch Analytics Dashboard
+        </button>
     </div>
     
     <div id="info">
@@ -50,9 +209,8 @@
             <div id="loading-indicator">Loading planets... Please wait.</div>
             Click on any celestial body to travel there and learn about it!
             <br><br>
-            <strong>New Features:</strong>
+            <strong>Features:</strong>
             <br>• 🌙 Moon orbiting Earth
-            <br>• 🛸 ISS circling our planet
             <br>• 🌓 Day/Night terminator
             <br>• 🌌 Aurora at Earth's poles
             <br>• 🌍 Realistic planet textures
@@ -60,10 +218,89 @@
             <br>• ⚪ Enhanced visible orbits
             <br>• 📏 Adjustable scale
             <br>• 🎯 Camera follows objects
+            <br>• 🌌 Directional Milky Way
         </div>
     </div>
 
+    <div id="mode-toggle">
+        <div class="mode-label">MODE</div>
+        <button id="btn-mode-toggle" class="mode-button" data-mode="low">
+            <span class="mode-text">LOW</span>
+            <div class="mode-indicator"></div>
+        </button>
+    </div>
+
+    <div id="dev-toggle">
+        <label>
+            <input type="checkbox" id="dev-mode-checkbox" checked>
+            DEV MODE
+        </label>
+    </div>
+
+    <div id="dev-log-container" class="dev-mode-active">
+        <div id="dev-log-header">
+            <span class="dev-console-title">Dev Console</span>
+            <div class="dev-console-controls">
+                <button class="dev-console-btn" id="dev-console-clear">Clear</button>
+                <button class="dev-console-btn" id="dev-console-export">Export</button>
+                <button class="dev-console-btn" id="dev-console-auto-scroll" title="Auto-scroll to bottom">📍</button>
+            </div>
+        </div>
+        <div id="dev-log-content"></div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    
+    <!-- Early dashboard loading for console capture - MUST BE FIRST -->
+    <script src="js/dashboard-data-store.js"></script>
+    <script src="js/webgl-charts.js"></script>
+    <script src="js/quantum-dashboard.js"></script>
+    
+    <!-- Chart.js for performance dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Advanced Dashboard Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack-all.js"></script>
+    <!-- High-Performance Dashboard Libraries -->
+    <script src="https://unpkg.com/uplot@1.6.24/dist/uPlot.iife.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/uplot@1.6.24/dist/uPlot.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css" rel="stylesheet">
+    <script src="js/blackhole-shader.js"></script>
+    <script src="js/planet-labels.js"></script>
+    <script src="js/orbit-trails.js"></script>
+    <script src="js/sun-effects.js"></script>
+    <script src="js/realistic-sun.js"></script>
+    <script src="js/cinematic-camera.js"></script>
+    <script src="js/info-panels-simple.js"></script>
+    <script src="js/ephemeris-engine.js"></script>
+    <script src="js/time-controls.js"></script>
+    <script src="js/moon-systems.js"></script>
+    <script src="js/asteroid-belt.js"></script>
+    <script src="js/spacecraft-models.js"></script>
+    <script src="js/spacecraft-tracker.js"></script>
+    <script src="js/measurement-tools.js"></script>
+    <script src="js/ring-systems.js"></script>
+    <script src="js/dwarf-planets-comets.js"></script>
+    <script src="js/atmosphere-system.js"></script>
+    <script src="js/settings-panel.js"></script>
+    <script src="js/settings-connector.js"></script>
+    <script src="js/settings-test.js"></script>
+    <script src="js/settings-debug.js"></script>
+    <script src="js/settings-logger.js"></script>
+    <script src="js/settings-init-test.js"></script>
+    <!-- Performance optimization scripts -->
+    <script src="js/optimization-utils.js"></script>
+    <script src="js/texture-manager.js"></script>
+    <script src="js/performance-monitor.js"></script>
+    <script src="js/memory-manager.js"></script>
+    <!-- Performance dashboard -->
+    <script src="js/performance-dashboard.js"></script>
+    <script src="js/dashboard-controller.js"></script>
     <script src="js/space-simulator.js"></script>
 </body>
 </html>

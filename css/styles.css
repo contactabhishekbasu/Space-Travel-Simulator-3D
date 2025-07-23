@@ -16,74 +16,555 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #333;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
+                0 0 80px rgba(99, 102, 241, 0.1),
+                inset 0 0 60px rgba(99, 102, 241, 0.05);
+    backdrop-filter: blur(10px);
+    max-width: 280px;
+}
+
+#controls h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #e0e7ff;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
 }
 
 #info {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #333;
-    max-width: 300px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    max-width: 350px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
+                0 0 80px rgba(99, 102, 241, 0.1),
+                inset 0 0 60px rgba(99, 102, 241, 0.05);
+    backdrop-filter: blur(10px);
+    display: none; /* Hide the old info box */
 }
 
+#destination-name {
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    font-weight: 300;
+    color: #f0f9ff;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+#planet-info {
+    color: #e0e7ff;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+#planet-info strong {
+    color: #60a5fa;
+    font-weight: 600;
+}
+
+/* Navigation grid layout */
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Control grid layout */
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+/* Navigation buttons with images */
+.nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    color: #e0e7ff;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    min-height: 80px;
+}
+
+.nav-button span {
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Planet icons */
+.planet-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+/* Individual planet styles */
+.planet-icon.blackhole {
+    background: radial-gradient(circle at center, #000000 40%, #400040 70%, transparent);
+    box-shadow: 0 0 20px #800080;
+}
+
+.planet-icon.sun {
+    background: radial-gradient(circle at 30% 30%, #ffff00, #ff8800);
+    box-shadow: 0 0 20px #ff8800;
+}
+
+.planet-icon.mercury {
+    background: radial-gradient(circle at 30% 30%, #c0b0a0, #8b7355);
+}
+
+.planet-icon.venus {
+    background: radial-gradient(circle at 30% 30%, #ffe4b5, #ffd700);
+}
+
+.planet-icon.earth {
+    background: radial-gradient(circle at 30% 30%, #4169e1, #0066cc);
+    position: relative;
+}
+
+.planet-icon.earth::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 20%;
+    width: 30%;
+    height: 30%;
+    background: #228b22;
+    border-radius: 50%;
+}
+
+.planet-icon.moon {
+    background: radial-gradient(circle at 30% 30%, #f0f0f0, #aaaaaa);
+}
+
+.planet-icon.mars {
+    background: radial-gradient(circle at 30% 30%, #ff6347, #cd5c5c);
+}
+
+.planet-icon.jupiter {
+    background: linear-gradient(to bottom, #daa520 10%, #b8860b 30%, #daa520 50%, #b8860b 70%, #daa520);
+}
+
+.planet-icon.saturn {
+    background: radial-gradient(circle at 30% 30%, #f4dfa0, #f4a460);
+    position: relative;
+}
+
+.planet-icon.saturn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 15px;
+    border: 3px solid #f4a460;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.planet-icon.uranus {
+    background: radial-gradient(circle at 30% 30%, #7fffd4, #40e0d0);
+}
+
+.planet-icon.neptune {
+    background: radial-gradient(circle at 30% 30%, #4169e1, #0000cd);
+}
+
+/* Legacy button styles for other buttons */
 button {
     display: block;
-    margin: 10px 0;
-    padding: 10px 20px;
-    background: #4a5568;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    margin: 8px 0;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    color: #e0e7ff;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.3s;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+    transition: left 0.5s;
 }
 
 button:hover {
-    background: #5a6578;
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9));
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3),
+                0 0 30px rgba(99, 102, 241, 0.1);
+}
+
+button:hover::before {
+    left: 100%;
 }
 
 button.active {
-    background: #2563eb;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(79, 70, 229, 0.8));
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Navigation button specific hover and active states */
+.nav-button:hover {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9));
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3),
+                0 0 30px rgba(99, 102, 241, 0.1);
+}
+
+.nav-button:hover .planet-icon {
+    transform: scale(1.1);
+}
+
+.nav-button.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(79, 70, 229, 0.8));
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Control buttons */
+.control-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    min-height: 60px;
+}
+
+.control-button:hover {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9));
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.2);
+    color: #e0e7ff;
+}
+
+.control-button.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(79, 70, 229, 0.6));
+    border-color: rgba(99, 102, 241, 0.6);
+    color: #f0f9ff;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3),
+                inset 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.control-button.cinematic {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.4));
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #e879f9;
+}
+
+.control-button.cinematic:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.6), rgba(147, 51, 234, 0.6));
+    border-color: rgba(168, 85, 247, 0.8);
+    color: #f0e6ff;
+}
+
+.control-button span {
+    margin-top: 4px;
+    text-align: center;
+    line-height: 1.1;
+}
+
+/* Control icons */
+.control-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.control-button:hover .control-icon {
+    transform: scale(1.1);
+}
+
+/* Individual control icon styles */
+.orbit-icon {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: 2px solid #fbbf24;
+    position: relative;
+}
+
+.orbit-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border: 1px solid #fbbf24;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.labels-icon {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    border: 2px solid #34d399;
+    position: relative;
+}
+
+.labels-icon::after {
+    content: 'A';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.trails-icon {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    border: 2px solid #60a5fa;
+    position: relative;
+}
+
+.trails-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 20%;
+    width: 60%;
+    height: 2px;
+    background: white;
+    border-radius: 1px;
+    box-shadow: 0 4px 0 white, 0 -4px 0 white;
+}
+
+.moons-icon {
+    background: linear-gradient(135deg, #d1d5db, #9ca3af);
+    border: 2px solid #d1d5db;
+    position: relative;
+}
+
+.moons-icon::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    right: 20%;
+    width: 8px;
+    height: 8px;
+    background: #f3f4f6;
+    border-radius: 50%;
+}
+
+.asteroids-icon {
+    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+    border: 2px solid #a78bfa;
+    position: relative;
+}
+
+.asteroids-icon::after {
+    content: '⋯';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.spacecraft-icon {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    border: 2px solid #f87171;
+    position: relative;
+}
+
+.spacecraft-icon::after {
+    content: '🚀';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+}
+
+.atmospheres-icon {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    border: 2px solid #06b6d4;
+    position: relative;
+}
+
+.atmospheres-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.overview-icon {
+    background: linear-gradient(135deg, #e879f9, #d946ef);
+    border: 2px solid #e879f9;
+    position: relative;
+}
+
+.overview-icon::after {
+    content: '◎';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.measurements-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 2px solid #f59e0b;
+    position: relative;
+}
+
+.measurements-icon::after {
+    content: '📏';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+}
+
+.dwarf-comets-icon {
+    background: linear-gradient(135deg, #9333ea, #7c3aed);
+    border: 2px solid #9333ea;
+    position: relative;
+}
+
+.dwarf-comets-icon::after {
+    content: '☄️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
 }
 
 #speed-control, #scale-control {
     margin: 20px 0;
+    padding: 15px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-#orbit-control {
-    margin: 15px 0;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-}
-
-#orbit-control label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-#orbit-control input[type="checkbox"] {
-    margin-right: 10px;
-    cursor: pointer;
-}
+/* Removed old control styles - now using control-button classes */
 
 input[type="range"] {
     width: 100%;
+    height: 6px;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+    transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+    transform: scale(1.2);
 }
 
 #scale-control label, #speed-control label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
 }
 
 .planet-info {
@@ -94,8 +575,14 @@ input[type="range"] {
 
 #distance {
     font-size: 12px;
-    color: #888;
-    margin-top: 10px;
+    color: #94a3b8;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 8px;
+    border-left: 3px solid rgba(99, 102, 241, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #loading-indicator {
@@ -105,8 +592,686 @@ input[type="range"] {
     animation: pulse 1s infinite;
 }
 
+/* Disable animation when parent info panel is hidden */
+#info[style*="display: none"] #loading-indicator {
+    animation: none !important;
+}
+
 @keyframes pulse {
     0% { opacity: 0.6; }
     50% { opacity: 1; }
     100% { opacity: 0.6; }
+}
+
+/* Mode Toggle Styles */
+#mode-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    padding: 15px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
+                0 0 80px rgba(99, 102, 241, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.mode-label {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.mode-button {
+    position: relative;
+    width: 120px;
+    height: 40px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.mode-button:hover {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.mode-text {
+    position: relative;
+    z-index: 2;
+    color: #e0e7ff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.mode-indicator {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* High mode styles */
+.mode-button[data-mode="high"] .mode-indicator {
+    left: calc(100% - 35px);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.mode-button[data-mode="high"] .mode-text {
+    color: #fecaca;
+}
+
+.mode-button[data-mode="high"] {
+    background: linear-gradient(135deg, rgba(127, 29, 29, 0.8), rgba(153, 27, 27, 0.8));
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Dev mode toggle */
+#dev-toggle {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 
+                0 0 20px rgba(99, 102, 241, 0.1),
+                inset 0 0 20px rgba(99, 102, 241, 0.05);
+    backdrop-filter: blur(10px);
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+#dev-toggle:hover {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.3);
+}
+
+#dev-toggle label {
+    display: flex;
+    align-items: center;
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+#dev-toggle input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    accent-color: #60a5fa;
+}
+
+/* Dev log container */
+#dev-log-container {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 400px;
+    height: 300px;
+    min-width: 300px;
+    min-height: 200px;
+    max-width: 80vw;
+    max-height: 80vh;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(0, 255, 0, 0.4);
+    border-radius: 8px;
+    display: none;
+    flex-direction: column;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    z-index: 999;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
+    backdrop-filter: blur(10px);
+    resize: both;
+    overflow: hidden;
+}
+
+#dev-log-container.dev-mode-active {
+    display: flex;
+}
+
+#dev-log-header {
+    background: rgba(0, 255, 0, 0.15);
+    color: #0ff;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: move;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 7px 7px 0 0;
+}
+
+#dev-log-header:hover {
+    background: rgba(0, 255, 0, 0.2);
+}
+
+#dev-log-header .dev-console-title {
+    flex: 1;
+}
+
+#dev-log-header .dev-console-controls {
+    display: flex;
+    gap: 8px;
+}
+
+#dev-log-header .dev-console-btn {
+    background: none;
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    color: #0ff;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+#dev-log-header .dev-console-btn:hover {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: #0ff;
+}
+
+#dev-log-content {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 0, 0.3) transparent;
+    scroll-behavior: smooth;
+}
+
+#dev-log-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#dev-log-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+#dev-log-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 3px;
+}
+
+.dev-log-entry {
+    margin-bottom: 4px;
+    padding: 2px 0;
+    line-height: 1.4;
+}
+
+.dev-log-entry.success {
+    color: #0f0;
+}
+
+.dev-log-entry.error {
+    color: #f00;
+}
+
+.dev-log-entry.warning {
+    color: #ff0;
+}
+
+.dev-log-entry.info {
+    color: #0ff;
+}
+
+.dev-log-timestamp {
+    color: #666;
+    margin-right: 8px;
+}
+
+/* Tabbed Navigation Styles */
+.nav-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.nav-tab {
+    flex: 1;
+    padding: 10px 8px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-tab:hover {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.8), rgba(71, 85, 105, 0.8));
+    color: #e0e7ff;
+    transform: translateY(-2px);
+}
+
+.nav-tab.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.7), rgba(79, 70, 229, 0.7));
+    color: #f0f9ff;
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+}
+
+.tab-content {
+    display: none;
+    margin-bottom: 15px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.object-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.object-card {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+    color: #e0e7ff;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    min-height: 50px;
+}
+
+.object-card:hover {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9));
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.2);
+}
+
+.object-card:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 5px rgba(99, 102, 241, 0.3);
+}
+
+.object-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.object-card:hover .object-icon {
+    transform: scale(1.1);
+}
+
+.object-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.object-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: #f0f9ff;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.object-type {
+    font-size: 9px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Specific object icon styles for cards */
+.object-icon.sun {
+    background: radial-gradient(circle at 30% 30%, #ffff00, #ff8800);
+    box-shadow: 0 0 15px #ff8800;
+}
+
+.object-icon.mercury {
+    background: radial-gradient(circle at 30% 30%, #c0b0a0, #8b7355);
+}
+
+.object-icon.venus {
+    background: radial-gradient(circle at 30% 30%, #ffe4b5, #ffd700);
+}
+
+.object-icon.earth {
+    background: radial-gradient(circle at 30% 30%, #4169e1, #0066cc);
+    position: relative;
+}
+
+.object-icon.earth::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 25%;
+    width: 25%;
+    height: 25%;
+    background: #228b22;
+    border-radius: 50%;
+}
+
+.object-icon.moon {
+    background: radial-gradient(circle at 30% 30%, #f0f0f0, #aaaaaa);
+}
+
+.object-icon.mars {
+    background: radial-gradient(circle at 30% 30%, #ff6347, #cd5c5c);
+}
+
+.object-icon.jupiter {
+    background: linear-gradient(to bottom, #daa520 10%, #b8860b 30%, #daa520 50%, #b8860b 70%, #daa520);
+}
+
+.object-icon.saturn {
+    background: radial-gradient(circle at 30% 30%, #f4dfa0, #f4a460);
+    position: relative;
+}
+
+.object-icon.saturn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 45px;
+    height: 12px;
+    border: 2px solid #f4a460;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.object-icon.uranus {
+    background: radial-gradient(circle at 30% 30%, #7fffd4, #40e0d0);
+}
+
+.object-icon.neptune {
+    background: radial-gradient(circle at 30% 30%, #4169e1, #0000cd);
+}
+
+.object-icon.blackhole {
+    background: radial-gradient(circle at center, #000000 40%, #400040 70%, transparent);
+    box-shadow: 0 0 15px #800080;
+}
+
+/* Icons for moons, asteroids, spacecraft */
+.object-icon.asteroid {
+    background: radial-gradient(circle at 30% 30%, #999999, #666666);
+    position: relative;
+}
+
+.object-icon.asteroid::after {
+    content: '⋯';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.object-icon.spacecraft {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    position: relative;
+}
+
+.object-icon.spacecraft::after {
+    content: '🚀';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+}
+
+.object-icon.jovian-moon {
+    background: radial-gradient(circle at 30% 30%, #e6ddd4, #c4a76b);
+}
+
+.object-icon.saturnian-moon {
+    background: radial-gradient(circle at 30% 30%, #f5f5dc, #d3d3d3);
+}
+
+.object-icon.ice-moon {
+    background: radial-gradient(circle at 30% 30%, #e6f3ff, #b8d4e3);
+}
+
+.object-icon.comet {
+    background: radial-gradient(circle at 30% 30%, #e0f7ff, #66ccff);
+    position: relative;
+}
+
+.object-icon.comet::after {
+    content: '☄️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+}
+
+/* Simple info panel styles */
+#simple-info-panel {
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
+                0 0 80px rgba(99, 102, 241, 0.1);
+}
+
+#simple-info-panel h2 {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+#simple-info-panel p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+#simple-info-panel strong {
+    color: #60a5fa;
+    font-weight: 600;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 320px) {
+    .object-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nav-tab {
+        font-size: 9px;
+        padding: 8px 4px;
+    }
+    
+    .object-name {
+        font-size: 11px;
+    }
+    
+    .object-type {
+        font-size: 8px;
+    }
+}
+
+/* Enhanced Dashboard Styles */
+.widget-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10002;
+}
+
+.widget-selector-modal .modal-content {
+    background: rgba(16, 22, 47, 0.95);
+    border: 1px solid #2196f3;
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+.widget-selector-modal h3 {
+    margin: 0 0 20px 0;
+    color: #e0e0e0;
+    font-size: 20px;
+}
+
+.widget-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.widget-options button {
+    background: rgba(33, 150, 243, 0.2);
+    border: 1px solid #2196f3;
+    color: #64b5f6;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.widget-options button:hover {
+    background: rgba(33, 150, 243, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+}
+
+/* Enhanced dashboard button in main controls */
+#enhanced-dashboard-btn {
+    background: linear-gradient(135deg, #1976d2, #2196f3);
+    border: 1px solid #64b5f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+#enhanced-dashboard-btn:hover {
+    background: linear-gradient(135deg, #2196f3, #64b5f6);
+    box-shadow: 0 6px 25px rgba(33, 150, 243, 0.5);
+    transform: translateY(-1px);
+}
+
+#enhanced-dashboard-btn:active {
+    transform: translateY(0);
+}
+
+/* D3.js animation styles */
+@keyframes d3-pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.spacecraft circle {
+    animation: d3-pulse 2s infinite;
+}
+
+/* GridStack responsive adjustments */
+@media (max-width: 1200px) {
+    .dashboard-sidebar {
+        width: 160px !important;
+    }
+    
+    .nav-item {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        display: none !important;
+    }
+    
+    .dashboard-content {
+        padding: 10px !important;
+    }
+    
+    .widget-title {
+        font-size: 14px !important;
+    }
+}
+
+/* Chart tooltips enhancement */
+.echarts-tooltip {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid #2196f3 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Performance optimization for charts */
+.chart-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
