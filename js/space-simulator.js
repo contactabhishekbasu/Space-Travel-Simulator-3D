@@ -3,9 +3,10 @@ console.log('space-simulator.js loading...');
 
 // Global variables for Three.js objects
 let scene, camera, renderer;
+let detectedQuality = 'low'; // Will be updated by auto-detection
 
 // Dev mode variables
-let devMode = true; // Default to true
+let devMode = false; // Default to false
 let devLogContainer;
 let devLogContent;
 let devLogs = []; // Store logs for local storage
@@ -47,7 +48,23 @@ const devLog = {
         
         const entry = document.createElement('div');
         entry.className = `dev-log-entry ${type}`;
-        entry.innerHTML = `<span class="dev-log-timestamp">${timestamp}</span>${message}`;
+        
+        // Create timestamp span safely
+        const timestampSpan = window.SecurityUtils ? 
+            window.SecurityUtils.createElement('span', timestamp, { className: 'dev-log-timestamp' }) :
+            document.createElement('span');
+        if (!window.SecurityUtils) {
+            timestampSpan.className = 'dev-log-timestamp';
+            timestampSpan.textContent = timestamp;
+        }
+        
+        // Add message content safely
+        entry.appendChild(timestampSpan);
+        if (window.SecurityUtils) {
+            window.SecurityUtils.safeAppend(entry, message);
+        } else {
+            entry.appendChild(document.createTextNode(message));
+        }
         
         devLogContent.appendChild(entry);
         
@@ -127,6 +144,374 @@ window.getLogSummary = function() {
     return summary;
 };
 
+// Session start time for quantum dashboard
+window.sessionStartTime = Date.now();
+
+// Initialize Quantum Dashboard bridge communication
+function initializeQuantumDashboard() {
+    devLog.info('Initializing Quantum Dashboard bridge...');
+    
+    // Check if we're embedded in an iframe (dashboard opened us)
+    const isEmbedded = window.parent !== window;
+    
+    // Listen for quantum dashboard messages
+    window.addEventListener('message', (event) => {
+        // Validate origin if needed
+        if (event.origin !== window.location.origin && event.origin !== 'null') {
+            return;
+        }
+        
+        const { type, data } = event.data;
+        
+        switch (type) {
+            case 'quantum:connect':
+                handleQuantumConnect(event);
+                break;
+            case 'quantum:request':
+                handleQuantumDataRequest(event);
+                break;
+            case 'quantum:control':
+                handleQuantumControl(event);
+                break;
+        }
+    });
+    
+    // Send connection acknowledgment if embedded
+    if (isEmbedded) {
+        window.parent.postMessage({
+            type: 'quantum:connect',
+            data: {
+                simulator: 'Space Travel Simulator 3D',
+                version: '2.0',
+                features: ['performance', 'celestial', 'user', 'system', 'control']
+            }
+        }, '*');
+        devLog.success('Quantum Dashboard connection established');
+    }
+    
+    // Start sending periodic heartbeats
+    setInterval(() => {
+        if (isEmbedded) {
+            window.parent.postMessage({
+                type: 'quantum:heartbeat',
+                timestamp: Date.now()
+            }, '*');
+        }
+    }, 5000);
+}
+
+// Handle quantum dashboard connection
+function handleQuantumConnect(event) {
+    devLog.info('Quantum Dashboard connected');
+    
+    // Send acknowledgment
+    event.source.postMessage({
+        type: 'quantum:connect',
+        data: {
+            connected: true,
+            timestamp: Date.now()
+        }
+    }, event.origin);
+}
+
+// Handle data requests from quantum dashboard
+function handleQuantumDataRequest(event) {
+    const { id, type, data } = event.data.data;
+    
+    let responseData = null;
+    
+    switch (data.type) {
+        case 'performance':
+            responseData = collectPerformanceData();
+            break;
+        case 'celestial':
+            responseData = collectCelestialData();
+            break;
+        case 'user':
+            responseData = collectUserData();
+            break;
+        case 'system':
+            responseData = collectSystemData();
+            break;
+    }
+    
+    // Send response
+    event.source.postMessage({
+        type: 'quantum:response',
+        id: id,
+        data: responseData
+    }, event.origin);
+}
+
+// Handle control commands from quantum dashboard
+function handleQuantumControl(event) {
+    const { action, params } = event.data.data;
+    
+    switch (action) {
+        case 'navigate':
+            navigateToPlanet(params.target);
+            devLog.info(`Navigation command received: ${params.target}`);
+            break;
+        case 'timeScale':
+            if (window.timeControls) {
+                window.timeControls.setTimeScale(params.scale);
+            }
+            break;
+        case 'toggle':
+            toggleFeature(params.feature, params.enabled);
+            break;
+        case 'screenshot':
+            takeScreenshot();
+            break;
+    }
+}
+
+// Collect performance data for quantum dashboard
+function collectPerformanceData() {
+    const data = {
+        fps: 60,
+        smoothFps: 60,
+        frameTime: 16.67,
+        memory: {}
+    };
+    
+    if (window.performanceMonitor) {
+        data.fps = window.performanceMonitor.currentFPS || 60;
+        data.avgFps = window.performanceMonitor.averageFPS || 60;
+        data.minFps = window.performanceMonitor.minFPS || 0;
+        data.maxFps = window.performanceMonitor.maxFPS || 120;
+        data.frameTime = window.performanceMonitor.deltaTime || 16.67;
+        data.performanceLevel = window.performanceMonitor.performanceLevel || 'good';
+        data.adaptiveChanges = window.performanceMonitor.adaptiveChanges || 0;
+        
+        if (window.performanceMonitor.memoryUsage) {
+            data.memory = window.performanceMonitor.memoryUsage;
+        }
+    }
+    
+    // Add renderer info if available
+    if (renderer && renderer.info) {
+        data.webgl = {
+            vendor: renderer.capabilities.vendor || 'Unknown',
+            renderer: renderer.capabilities.renderer || 'Unknown'
+        };
+    }
+    
+    return data;
+}
+
+// Collect celestial data for quantum dashboard
+function collectCelestialData() {
+    const data = {
+        planets: {},
+        timeScale: 1,
+        currentDate: new Date(),
+        ephemerisActive: false,
+        camera: null
+    };
+    
+    // Collect planet positions
+    for (const [name, body] of Object.entries(celestialBodies)) {
+        if (body.mesh) {
+            data.planets[name] = {
+                position: {
+                    x: body.mesh.position.x,
+                    y: body.mesh.position.y,
+                    z: body.mesh.position.z
+                },
+                distanceFromSun: body.mesh.position.length(),
+                visible: body.mesh.visible,
+                velocity: 0 // Could calculate if needed
+            };
+        }
+    }
+    
+    // Time controls data
+    if (window.timeControls) {
+        data.timeScale = window.timeControls.timeScale;
+        data.currentDate = window.timeControls.currentDate;
+        data.ephemerisActive = window.timeControls.isPlaying;
+    } else if (window.ephemerisEngine) {
+        data.ephemerisActive = window.ephemerisEngine.isActive;
+    }
+    
+    // Camera data
+    if (camera) {
+        data.camera = {
+            position: {
+                x: camera.position.x,
+                y: camera.position.y,
+                z: camera.position.z
+            },
+            target: cameraFollowTarget || 'free'
+        };
+    }
+    
+    return data;
+}
+
+// Collect user interaction data
+function collectUserData() {
+    const data = {
+        sessionDuration: 0,
+        interactions: 0,
+        planetsVisited: [],
+        featuresUsed: [],
+        activeFeatures: []
+    };
+    
+    // Calculate session duration
+    if (window.sessionStartTime) {
+        data.sessionDuration = Math.floor((Date.now() - window.sessionStartTime) / 1000);
+    }
+    
+    // Collect active features
+    if (window.settingsPanel && window.settingsPanel.settings) {
+        const settings = window.settingsPanel.settings;
+        for (const [key, setting] of Object.entries(settings)) {
+            if (setting.enabled) {
+                data.activeFeatures.push(key);
+            }
+        }
+    }
+    
+    // Check specific features
+    if (orbitsVisible) data.activeFeatures.push('orbits');
+    if (labelsVisible) data.activeFeatures.push('labels');
+    if (trailsVisible) data.activeFeatures.push('trails');
+    if (moonsVisible) data.activeFeatures.push('moons');
+    if (asteroidsVisible) data.activeFeatures.push('asteroids');
+    if (spacecraftVisible) data.activeFeatures.push('spacecraft');
+    
+    return data;
+}
+
+// Collect system data for quantum dashboard
+function collectSystemData() {
+    const data = {
+        rendererInfo: {},
+        sceneInfo: {},
+        textureInfo: {},
+        errors: []
+    };
+    
+    // Renderer info
+    if (renderer && renderer.info) {
+        const info = renderer.info;
+        data.rendererInfo = {
+            calls: info.render.calls,
+            triangles: info.render.triangles,
+            points: info.render.points,
+            lines: info.render.lines,
+            geometries: info.memory.geometries,
+            textures: info.memory.textures,
+            programs: info.programs ? info.programs.length : 0
+        };
+    }
+    
+    // Scene info
+    if (scene) {
+        let objectCount = 0;
+        let lightCount = 0;
+        
+        scene.traverse((obj) => {
+            objectCount++;
+            if (obj.isLight) lightCount++;
+        });
+        
+        data.sceneInfo = {
+            objects: objectCount,
+            lights: lightCount
+        };
+    }
+    
+    // Texture manager info
+    if (window.textureManager) {
+        data.textureInfo = window.textureManager.getStats();
+    }
+    
+    // Recent errors from dev log
+    if (devLogs) {
+        data.errors = devLogs
+            .filter(log => log.type === 'error' && Date.now() - Date.parse(log.fullTime) < 60000)
+            .slice(-5);
+    }
+    
+    return data;
+}
+
+// Helper function to toggle features
+function toggleFeature(feature, enabled) {
+    switch (feature) {
+        case 'orbits':
+            orbitsVisible = enabled;
+            updateOrbitsVisibility();
+            break;
+        case 'labels':
+            labelsVisible = enabled;
+            if (window.planetLabels) {
+                window.planetLabels.setVisibility(enabled);
+            }
+            break;
+        case 'trails':
+            trailsVisible = enabled;
+            if (window.orbitTrails) {
+                window.orbitTrails.setVisibility(enabled);
+            }
+            break;
+        case 'moons':
+            moonsVisible = enabled;
+            if (window.moonSystems) {
+                window.moonSystems.setVisibility(enabled);
+            }
+            break;
+        case 'asteroids':
+            asteroidsVisible = enabled;
+            if (window.asteroidBelt) {
+                window.asteroidBelt.setVisibility(enabled);
+            }
+            break;
+        case 'spacecraft':
+            spacecraftVisible = enabled;
+            if (window.spacecraftTracker) {
+                window.spacecraftTracker.setVisibility(enabled);
+            }
+            break;
+    }
+}
+
+// Helper function to take screenshot
+function takeScreenshot() {
+    if (!renderer) return;
+    
+    renderer.render(scene, camera);
+    const dataURL = renderer.domElement.toDataURL('image/png');
+    
+    // Send screenshot data back to dashboard
+    if (window.parent !== window) {
+        window.parent.postMessage({
+            type: 'quantum:screenshot',
+            data: {
+                dataURL,
+                timestamp: Date.now()
+            }
+        }, '*');
+    }
+    
+    devLog.info('Screenshot captured for Quantum Dashboard');
+}
+
+// Helper function to navigate to planet from quantum dashboard
+function navigateToPlanet(planet) {
+    if (navigateToObject) {
+        navigateToObject(planet);
+    } else if (travelTo) {
+        travelTo(planet);
+    } else {
+        devLog.error('Navigation functions not available');
+    }
+}
+
 // Initialize Three.js scene after DOM is loaded
 function initializeScene() {
     devLog.info('Initializing Three.js scene...');
@@ -141,6 +526,58 @@ function initializeScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     
     devLog.success('Scene, camera, and renderer created');
+    
+    // Auto-detect optimal quality based on device capabilities
+    function detectOptimalQuality() {
+        const gl = renderer.getContext();
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        
+        // Check GPU
+        let gpuTier = 'low';
+        let gpu = 'Unknown GPU';
+        if (debugInfo) {
+            gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            // High-end GPUs
+            if (gpu.match(/RTX|GTX.*[2-4]0[6-9]0|Radeon.*RX.*[5-7][0-9]{3}|Apple.*M[1-3]|NVIDIA.*[3-4]0[0-9]0/i)) {
+                gpuTier = 'high';
+            }
+            // Mid-tier GPUs
+            else if (gpu.match(/GTX.*16|GTX.*10[5-8]0|Radeon.*RX.*[4-5][0-9]{2}|Intel.*Iris/i)) {
+                gpuTier = 'medium';
+            }
+        }
+        
+        // Check memory
+        const memory = navigator.deviceMemory || 4; // GB
+        const memoryTier = memory >= 8 ? 'high' : memory >= 4 ? 'medium' : 'low';
+        
+        // Check CPU cores
+        const cores = navigator.hardwareConcurrency || 4;
+        const cpuTier = cores >= 8 ? 'high' : cores >= 4 ? 'medium' : 'low';
+        
+        // Determine quality - be conservative
+        let quality = 'low';
+        if (gpuTier === 'high' && memoryTier !== 'low' && cpuTier !== 'low') {
+            quality = 'high';
+        } else if (gpuTier !== 'low' && memoryTier === 'high' && cpuTier === 'high') {
+            quality = 'high';
+        }
+        
+        devLog.info(`Auto-detected quality: ${quality}`);
+        devLog.info(`GPU: ${gpu.substring(0, 50)} (${gpuTier})`);
+        devLog.info(`Memory: ${memory}GB (${memoryTier}), Cores: ${cores} (${cpuTier})`);
+        
+        // Set quality on the mode button
+        if (modeButton && modeText) {
+            modeButton.setAttribute('data-mode', quality);
+            modeText.textContent = quality.toUpperCase();
+        }
+        
+        return quality;
+    }
+    
+    // Auto-detect and set quality mode
+    detectedQuality = detectOptimalQuality();
     
     // Initialize all global systems
     window.planetLabels = null;
@@ -294,6 +731,9 @@ function initializeScene() {
         }
     }
     
+    // Initialize quantum dashboard bridge
+    initializeQuantumDashboard();
+    
     if (typeof MemoryManager !== 'undefined') {
         try {
             window.memoryManager = new MemoryManager();
@@ -308,7 +748,7 @@ function initializeScene() {
     setTimeout(() => {
         if (window.dashboardController) {
             window.dashboardController.showNotification(
-                '🚀 Performance optimizations active! Press Shift+F12 to open dashboard', 
+                '🚀 Performance optimizations active! Enable Dev Mode or press Shift+F12 for dashboard', 
                 'info'
             );
         }
@@ -2122,7 +2562,13 @@ function updateDestinationInfo(data) {
             infoHTML += `<br><br><em>${data.educational}</em>`;
         }
         
-        planetInfo.innerHTML = infoHTML;
+        // Set planet info safely
+        if (window.SecurityUtils) {
+            window.SecurityUtils.setSafeInnerHTML(planetInfo, infoHTML);
+        } else {
+            // Fallback - clear and add as text only
+            planetInfo.textContent = infoHTML.replace(/<[^>]*>/g, ' '); // Strip HTML tags
+        }
     }
     
     // Use info panels if available
@@ -2458,9 +2904,12 @@ function populateMoonsTab(moonData) {
     const moonsGrid = document.getElementById('moons-grid');
     if (!moonsGrid) return;
     
-    // Clear existing content except Earth's Moon button
+    // Clear existing content except Earth's Moon button safely
     const earthMoonButton = document.getElementById('btn-moon');
-    moonsGrid.innerHTML = '';
+    // Clear safely
+    while (moonsGrid.firstChild) {
+        moonsGrid.removeChild(moonsGrid.firstChild);
+    }
     if (earthMoonButton) {
         moonsGrid.appendChild(earthMoonButton);
     }
@@ -2478,13 +2927,34 @@ function populateMoonsTab(moonData) {
             else if (planet === 'saturn') moonType = 'saturnian-moon';
             else if (moon.info && moon.info.toLowerCase().includes('ice')) moonType = 'ice-moon';
             
-            card.innerHTML = `
-                <div class="object-icon ${moonType}"></div>
-                <div class="object-info">
-                    <span class="object-name">${moon.name}</span>
-                    <span class="object-type">${planet.charAt(0).toUpperCase() + planet.slice(1)}'s Moon</span>
-                </div>
-            `;
+            // Create moon card elements safely
+            const iconDiv = document.createElement('div');
+            iconDiv.className = `object-icon ${moonType}`;
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'object-info';
+            
+            const nameSpan = window.SecurityUtils ? 
+                window.SecurityUtils.createElement('span', moon.name, { className: 'object-name' }) :
+                document.createElement('span');
+            if (!window.SecurityUtils) {
+                nameSpan.className = 'object-name';
+                nameSpan.textContent = moon.name;
+            }
+            
+            const planetName = planet.charAt(0).toUpperCase() + planet.slice(1);
+            const typeSpan = window.SecurityUtils ? 
+                window.SecurityUtils.createElement('span', `${planetName}'s Moon`, { className: 'object-type' }) :
+                document.createElement('span');
+            if (!window.SecurityUtils) {
+                typeSpan.className = 'object-type';
+                typeSpan.textContent = `${planetName}'s Moon`;
+            }
+            
+            infoDiv.appendChild(nameSpan);
+            infoDiv.appendChild(typeSpan);
+            card.appendChild(iconDiv);
+            card.appendChild(infoDiv);
             
             moonsGrid.appendChild(card);
         });
@@ -2667,7 +3137,10 @@ function initDevConsoleEnhancements() {
     // Initialize button handlers
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            devLogContent.innerHTML = '';
+            // Clear dev log safely
+            while (devLogContent.firstChild) {
+                devLogContent.removeChild(devLogContent.firstChild);
+            }
             devLogs = [];
             localStorage.removeItem('spaceSimDevLogs');
             devLog.info('Console cleared');
@@ -2810,8 +3283,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     devLog.info('Space Travel Simulator initializing...');
-    devLog.info('Dev mode: ON');
-    devLog.info('Quality mode: HIGH');
+    devLog.info('Dev mode: OFF');
+    devLog.info(`Quality mode: ${detectedQuality ? detectedQuality.toUpperCase() : 'AUTO'}`);
     devLog.info('Press Ctrl/Cmd + L to export logs');
     
     // Dev mode toggle handler
@@ -2820,21 +3293,27 @@ document.addEventListener('DOMContentLoaded', () => {
         devMode = e.target.checked;
         if (devMode) {
             devLogContainer.classList.add('dev-mode-active');
-            devLog.info('Dev mode enabled');
+            devLog.success('Dev mode enabled');
             
-            // Track dev mode usage for analytics
-            if (window.dashboardController && window.dashboardController.dashboard) {
-                window.dashboardController.dashboard.trackUserInteraction('dev_mode_enabled', {
-                    feature: 'dev_console'
-                });
+            // Auto-launch performance dashboard if available
+            if (window.performanceDashboard) {
+                window.performanceDashboard.show();
+                devLog.info('Performance dashboard opened');
+            } else if (typeof PerformanceDashboard !== 'undefined') {
+                window.performanceDashboard = new PerformanceDashboard();
+                window.performanceDashboard.show();
+                devLog.info('Performance dashboard initialized and opened');
             }
-            
-            // Open performance dashboard when dev mode is enabled
-            openDashboardInNewTab();
             
         } else {
             devLogContainer.classList.remove('dev-mode-active');
             devLog.info('Dev mode disabled');
+            
+            // Hide performance dashboard
+            if (window.performanceDashboard) {
+                window.performanceDashboard.hide();
+                devLog.info('Performance dashboard closed');
+            }
         }
     });
 

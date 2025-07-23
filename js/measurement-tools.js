@@ -53,7 +53,8 @@ class MeasurementTools {
             font-family: 'Courier New', monospace;
         `;
         
-        panel.innerHTML = `
+        // Use safe HTML setting for static content
+        const panelHTML = `
             <div style="display: flex; align-items: center; justify-content: between; margin-bottom: 15px;">
                 <h3 style="margin: 0; color: #60a5fa; font-size: 16px; text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);">
                     📏 MEASUREMENTS
@@ -117,6 +118,13 @@ class MeasurementTools {
                 </div>
             </div>
         `;
+        
+        if (window.SecurityUtils) {
+            window.SecurityUtils.setSafeInnerHTML(panel, panelHTML);
+        } else {
+            // Fallback for static content
+            panel.innerHTML = panelHTML;
+        }
         
         document.body.appendChild(panel);
         this.measurementPanel = panel;
@@ -560,7 +568,10 @@ class MeasurementTools {
     }
     
     updateMeasurementDisplay() {
-        this.measurementList.innerHTML = '';
+        // Clear measurements list safely
+        while (this.measurementList.firstChild) {
+            this.measurementList.removeChild(this.measurementList.firstChild);
+        }
         
         this.measurements.forEach(measurement => {
             const item = document.createElement('div');
@@ -579,12 +590,45 @@ class MeasurementTools {
                     break;
             }
             
-            item.innerHTML = `
-                <div class="measurement-type">${measurement.type.toUpperCase()}</div>
-                <div class="measurement-value">${valueText}</div>
-                <div class="measurement-objects">${measurement.objects.join(' → ')}</div>
-                <button class="measurement-delete" onclick="window.measurementTools.deleteMeasurement(${measurement.id})">✕</button>
-            `;
+            // Create measurement item elements safely
+            const typeDiv = window.SecurityUtils ? 
+                window.SecurityUtils.createElement('div', measurement.type.toUpperCase(), { className: 'measurement-type' }) :
+                document.createElement('div');
+            if (!window.SecurityUtils) {
+                typeDiv.className = 'measurement-type';
+                typeDiv.textContent = measurement.type.toUpperCase();
+            }
+            
+            const valueDiv = window.SecurityUtils ? 
+                window.SecurityUtils.createElement('div', valueText, { className: 'measurement-value' }) :
+                document.createElement('div');
+            if (!window.SecurityUtils) {
+                valueDiv.className = 'measurement-value';
+                valueDiv.textContent = valueText;
+            }
+            
+            const objectsDiv = window.SecurityUtils ? 
+                window.SecurityUtils.createElement('div', measurement.objects.join(' → '), { className: 'measurement-objects' }) :
+                document.createElement('div');
+            if (!window.SecurityUtils) {
+                objectsDiv.className = 'measurement-objects';
+                objectsDiv.textContent = measurement.objects.join(' → ');
+            }
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'measurement-delete';
+            deleteBtn.textContent = '✕';
+            deleteBtn.addEventListener('click', () => {
+                if (window.measurementTools) {
+                    window.measurementTools.deleteMeasurement(measurement.id);
+                }
+            });
+            
+            // Append all elements
+            item.appendChild(typeDiv);
+            item.appendChild(valueDiv);
+            item.appendChild(objectsDiv);
+            item.appendChild(deleteBtn);
             
             this.measurementList.appendChild(item);
         });

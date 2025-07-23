@@ -969,8 +969,14 @@ class InfoPanels {
             // Add active tab indicator style
             this.addTabStyles();
             
-            // Set the HTML
-            this.container.innerHTML = panelHTML;
+            // Set the HTML safely
+            if (window.SecurityUtils) {
+                window.SecurityUtils.setSafeInnerHTML(this.container, panelHTML);
+            } else {
+                // Fallback - escape content for security
+                this.container.textContent = 'Error: Security utilities not loaded';
+                console.error('SecurityUtils not available - cannot safely display panel content');
+            }
             this.container.style.display = 'block';
             this.currentPanel = planetData.name;
             
@@ -1149,52 +1155,130 @@ class InfoPanels {
     }
     
     showMissionInfo(missionData) {
-        this.container.innerHTML = `
-            <div class="mission-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
-                    <h2 style="margin: 0; color: #ff9800; font-size: 24px;">${missionData.name}</h2>
-                    <span style="color: #ffd54f; font-size: 14px;">${missionData.agency} | ${missionData.status}</span>
-                </div>
-                <button onclick="window.infoPanels.hide()" style="
-                    background: none;
-                    border: 1px solid #ff9800;
-                    color: #ff9800;
-                    padding: 5px 15px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                ">Close</button>
-            </div>
-            
-            <div class="mission-timeline" style="margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span><strong>Launch:</strong> ${missionData.launchDate}</span>
-                    <span><strong>Duration:</strong> ${missionData.duration}</span>
-                    <span><strong>Target:</strong> ${missionData.target}</span>
-                </div>
-                <div class="progress-bar" style="background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px;">
-                    <div style="background: #ff9800; height: 100%; width: ${missionData.progress}%; border-radius: 2px;"></div>
-                </div>
-            </div>
-            
-            <div class="mission-objectives" style="margin: 20px 0;">
-                <h3 style="color: #ffb74d; font-size: 16px; margin-bottom: 10px;">Mission Objectives</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${missionData.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                </ul>
-            </div>
-            
-            ${missionData.achievements ? `
-            <div class="mission-achievements" style="margin: 20px 0;">
-                <h3 style="color: #81c784; font-size: 16px; margin-bottom: 10px;">Key Achievements</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${missionData.achievements.map(ach => `<li>${ach}</li>`).join('')}
-                </ul>
-            </div>
-            ` : ''}
-        `;
+        // Clear container first
+        this.container.innerHTML = '';
+        
+        // Create mission panel using safe DOM manipulation
+        const missionPanel = this.createMissionPanel(missionData);
+        this.container.appendChild(missionPanel);
         
         this.container.style.display = 'block';
         this.currentPanel = missionData.name;
+    }
+    
+    createMissionPanel(missionData) {
+        const panel = document.createElement('div');
+        
+        // Mission header
+        const header = document.createElement('div');
+        header.className = 'mission-header';
+        header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;';
+        
+        const headerInfo = document.createElement('div');
+        const title = window.SecurityUtils.createElement('h2', missionData.name, {
+            style: 'margin: 0; color: #ff9800; font-size: 24px;'
+        });
+        const subtitle = window.SecurityUtils.createElement('span', 
+            `${missionData.agency} | ${missionData.status}`, {
+            style: 'color: #ffd54f; font-size: 14px;'
+        });
+        
+        headerInfo.appendChild(title);
+        headerInfo.appendChild(subtitle);
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Close';
+        closeBtn.style.cssText = 'background: none; border: 1px solid #ff9800; color: #ff9800; padding: 5px 15px; border-radius: 5px; cursor: pointer;';
+        closeBtn.addEventListener('click', () => window.infoPanels.hide());
+        
+        header.appendChild(headerInfo);
+        header.appendChild(closeBtn);
+        
+        // Mission timeline
+        const timeline = document.createElement('div');
+        timeline.className = 'mission-timeline';
+        timeline.style.cssText = 'margin: 20px 0;';
+        
+        const timelineInfo = document.createElement('div');
+        timelineInfo.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 10px;';
+        
+        const launch = window.SecurityUtils.createElement('span', `Launch: ${missionData.launchDate}`);
+        launch.innerHTML = `<strong>Launch:</strong> ${window.SecurityUtils.escapeHtml(missionData.launchDate)}`;
+        
+        const duration = window.SecurityUtils.createElement('span', `Duration: ${missionData.duration}`);
+        duration.innerHTML = `<strong>Duration:</strong> ${window.SecurityUtils.escapeHtml(missionData.duration)}`;
+        
+        const target = window.SecurityUtils.createElement('span', `Target: ${missionData.target}`);
+        target.innerHTML = `<strong>Target:</strong> ${window.SecurityUtils.escapeHtml(missionData.target)}`;
+        
+        timelineInfo.appendChild(launch);
+        timelineInfo.appendChild(duration);
+        timelineInfo.appendChild(target);
+        
+        // Progress bar
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.style.cssText = 'background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px;';
+        
+        const progress = document.createElement('div');
+        progress.style.cssText = `background: #ff9800; height: 100%; width: ${parseFloat(missionData.progress) || 0}%; border-radius: 2px;`;
+        
+        progressBar.appendChild(progress);
+        timeline.appendChild(timelineInfo);
+        timeline.appendChild(progressBar);
+        
+        // Mission objectives
+        const objectives = document.createElement('div');
+        objectives.className = 'mission-objectives';
+        objectives.style.cssText = 'margin: 20px 0;';
+        
+        const objTitle = window.SecurityUtils.createElement('h3', 'Mission Objectives', {
+            style: 'color: #ffb74d; font-size: 16px; margin-bottom: 10px;'
+        });
+        objectives.appendChild(objTitle);
+        
+        const objList = document.createElement('ul');
+        objList.style.cssText = 'margin: 0; padding-left: 20px;';
+        
+        if (missionData.objectives && Array.isArray(missionData.objectives)) {
+            missionData.objectives.forEach(obj => {
+                const listItem = window.SecurityUtils.createElement('li', obj);
+                objList.appendChild(listItem);
+            });
+        }
+        objectives.appendChild(objList);
+        
+        // Achievements (if any)
+        let achievements = null;
+        if (missionData.achievements && Array.isArray(missionData.achievements)) {
+            achievements = document.createElement('div');
+            achievements.className = 'mission-achievements';
+            achievements.style.cssText = 'margin: 20px 0;';
+            
+            const achTitle = window.SecurityUtils.createElement('h3', 'Key Achievements', {
+                style: 'color: #81c784; font-size: 16px; margin-bottom: 10px;'
+            });
+            achievements.appendChild(achTitle);
+            
+            const achList = document.createElement('ul');
+            achList.style.cssText = 'margin: 0; padding-left: 20px;';
+            
+            missionData.achievements.forEach(ach => {
+                const listItem = window.SecurityUtils.createElement('li', ach);
+                achList.appendChild(listItem);
+            });
+            achievements.appendChild(achList);
+        }
+        
+        // Assemble the panel
+        panel.appendChild(header);
+        panel.appendChild(timeline);
+        panel.appendChild(objectives);
+        if (achievements) {
+            panel.appendChild(achievements);
+        }
+        
+        return panel;
     }
     
     hide() {

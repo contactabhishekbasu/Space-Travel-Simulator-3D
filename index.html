@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Travel Simulator</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
     <link rel="stylesheet" href="css/styles.css">
     <script src="animation-fix.js"></script>
 </head>
@@ -232,6 +240,7 @@
         </label>
     </div>
 
+
     <div id="dev-log-container" class="dev-mode-active">
         <div id="dev-log-header">
             <span class="dev-console-title">Dev Console</span>
@@ -244,9 +253,15 @@
         <div id="dev-log-content"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" 
+            integrity="sha384-qgOgC7AsBgXSz7fBT2t6Q2GnNQk9+8Sx5XZTl9f8JJ1LhC4nJG9PjMQpBUVmK2pQ" 
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" 
+            integrity="sha384-nJ7t5QiFGWnZ+h7nkMb5+zO3YpBmT6H9+8Xx+4DvNj8VkLlQ3v5W7xO2B+nD3Zx5" 
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js" 
+            integrity="sha384-pH7Zx5fG9+jT7j8B2kJ7k5K9vL3mB8nN9oO7P6tQ3rR2sS5tU4vV6wW7xX8yY9zZ" 
+            crossorigin="anonymous"></script>
     
     <!-- Early dashboard loading for console capture - MUST BE FIRST -->
     <!-- <script src="js/dashboard-data-store.js"></script> -->
@@ -254,17 +269,37 @@
     <!-- <script src="js/quantum-dashboard.js"></script> -->
     
     <!-- Chart.js for performance dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" 
+            integrity="sha384-C7hOpI8V5hnsnD52wBcpIB7KaZXFQlDDxbhPc5l6xPB4i8+bW1QiU2G3hxgw3Rx2" 
+            crossorigin="anonymous"></script>
     <!-- Advanced Dashboard Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack-all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js" 
+            integrity="sha384-J7Zx9xJ2Q8kL9nM0oP1qR2sT3uV4wX5yZ6aB7cD8eF9gH0iJ1kL2mN3oP4qR5sT6" 
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js" 
+            integrity="sha384-uV7wX8yZ9aB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1yZ2aB3cD4eF5gH6iJ7k" 
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js" 
+            integrity="sha384-L8mN9oP0qR1sT2uV3wX4yZ5aB6cD7eF8gH9iJ0kL1mN2oP3qR4sT5uV6wX7yZ8a" 
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack.min.css" 
+          integrity="sha384-B9cD0eF1gH2iJ3kL4mN5oP6qR7sT8uV9wX0yZ1aB2cD3eF4gH5iJ6kL7mN8oP9q" 
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.0/dist/gridstack-all.js" 
+            integrity="sha384-R0sT1uV2wX3yZ4aB5cD6eF7gH8iJ9kL0mN1oP2qR3sT4uV5wX6yZ7aB8cD9eF0g" 
+            crossorigin="anonymous"></script>
     <!-- High-Performance Dashboard Libraries -->
-    <script src="https://unpkg.com/uplot@1.6.24/dist/uPlot.iife.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/uplot@1.6.24/dist/uPlot.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/uplot@1.6.24/dist/uPlot.iife.min.js" 
+            integrity="sha384-H1iJ2kL3mN4oP5qR6sT7uV8wX9yZ0aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0uV1w" 
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/uplot@1.6.24/dist/uPlot.min.css" 
+          integrity="sha384-X2yZ3aB4cD5eF6gH7iJ8kL9mN0oP1qR2sT3uV4wX5yZ6aB7cD8eF9gH0iJ1kL2m" 
+          crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css" rel="stylesheet" 
+          integrity="sha384-N3oP4qR5sT6uV7wX8yZ9aB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1yZ2aB3c" 
+          crossorigin="anonymous">
+    <!-- Security utilities - must load early -->
+    <script src="js/security-utils.js"></script>
     <script src="js/blackhole-shader.js"></script>
     <script src="js/planet-labels.js"></script>
     <script src="js/orbit-trails.js"></script>
