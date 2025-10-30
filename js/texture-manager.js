@@ -54,8 +54,8 @@ class TextureManager {
         
         // Queue for loading if not immediate priority
         if (priority !== 'immediate' && this.isLoading) {
-            return new Promise((resolve) => {
-                this.loadingQueue.push({ name, cacheKey, resolve });
+            return new Promise((resolve, reject) => {
+                this.loadingQueue.push({ name, cacheKey, resolve, reject });
             });
         }
         
@@ -265,10 +265,17 @@ class TextureManager {
     // Process loading queue
     processQueue() {
         if (this.loadingQueue.length === 0 || this.isLoading) return;
-        
+
         const next = this.loadingQueue.shift();
         this.loadTextureImmediate(next.name, next.cacheKey)
-            .then(next.resolve);
+            .then(next.resolve)
+            .catch(error => {
+                if (next.reject) {
+                    next.reject(error);
+                } else {
+                    console.error('TextureManager: Error loading queued texture:', error);
+                }
+            });
     }
     
     // Preload common textures

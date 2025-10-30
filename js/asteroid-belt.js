@@ -386,7 +386,8 @@ class AsteroidBelt {
     checkCollision(position, radius) {
         for (const asteroid of this.asteroids) {
             const distance = position.distanceTo(asteroid.mesh.position);
-            if (distance < radius + asteroid.mesh.geometry.parameters.radius) {
+            const asteroidRadius = asteroid.mesh.geometry.parameters?.radius || 0.5;
+            if (distance < radius + asteroidRadius) {
                 return asteroid.data;
             }
         }

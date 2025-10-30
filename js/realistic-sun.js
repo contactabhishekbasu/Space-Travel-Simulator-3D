@@ -1,7 +1,16 @@
 // Ultra-realistic sun visualization with advanced shaders and effects
+
+// devLog fallback for consistent logging
+const devLog = window.devLog || {
+    success: (msg, ...args) => console.log(`✓ ${msg}`, ...args),
+    error: (msg, ...args) => console.error(`✗ ${msg}`, ...args),
+    warning: (msg, ...args) => console.warn(`⚠ ${msg}`, ...args),
+    info: (msg, ...args) => console.log(`ℹ ${msg}`, ...args)
+};
+
 class RealisticSun {
     constructor(scene, position, size) {
-        console.log('RealisticSun: Constructor called', { position, size });
+        devLog.info('RealisticSun: Constructor called', { position, size });
         
         this.scene = scene;
         this.position = position;
@@ -13,38 +22,38 @@ class RealisticSun {
             this.group = new THREE.Group();
             this.group.position.copy(position);
             
-            console.log('RealisticSun: Creating sun components...');
+            devLog.info('RealisticSun: Creating sun components...');
             this.createSunCore();
-            console.log('RealisticSun: Sun core created');
-            
+            devLog.success('RealisticSun: Sun core created');
+
             this.createChromosphere();
-            console.log('RealisticSun: Chromosphere created');
-            
+            devLog.success('RealisticSun: Chromosphere created');
+
             this.createCorona();
-            console.log('RealisticSun: Corona created');
-            
+            devLog.success('RealisticSun: Corona created');
+
             this.createSolarFlares();
-            console.log('RealisticSun: Solar flares created');
-            
+            devLog.success('RealisticSun: Solar flares created');
+
             this.createProminences();
-            console.log('RealisticSun: Prominences created');
-            
+            devLog.success('RealisticSun: Prominences created');
+
             // Disabled heat distortion due to rendering artifacts
             // this.createHeatDistortion();
-            // console.log('RealisticSun: Heat distortion created');
-            
+            // devLog.success('RealisticSun: Heat distortion created');
+
             this.scene.add(this.group);
-            console.log('RealisticSun: All components created and added to scene');
-            
+            devLog.success('RealisticSun: All components created and added to scene');
+
         } catch (error) {
-            console.error('RealisticSun: Error during construction:', error);
+            devLog.error('RealisticSun: Error during construction:', error);
             // Create a fallback simple sun
             this.createFallbackSun();
         }
     }
     
     createFallbackSun() {
-        console.log('RealisticSun: Creating fallback simple sun due to error');
+        devLog.warning('RealisticSun: Creating fallback simple sun due to error');
         const geometry = new THREE.SphereGeometry(this.size, 64, 64);
         const material = new THREE.MeshBasicMaterial({
             color: 0xffaa00,
@@ -307,12 +316,12 @@ class RealisticSun {
         const textureMode = window.simulationMode || 'high';
         const texturePath = `textures/${textureMode}/${textureMode === 'high' ? '8k' : '2k'}_sun.jpg`;
         
-        console.log(`RealisticSun: Loading texture from ${texturePath}`);
-        
+        devLog.info(`RealisticSun: Loading texture from ${texturePath}`);
+
         textureLoader.load(
-            texturePath, 
+            texturePath,
             (texture) => {
-                console.log('RealisticSun: Sun texture loaded successfully');
+                devLog.success('RealisticSun: Sun texture loaded successfully');
                 sunShader.uniforms.sunTexture.value = texture;
                 sunShader.defines = { USE_MAP: true };
                 sunShader.needsUpdate = true;
@@ -322,13 +331,13 @@ class RealisticSun {
                 if (progress.lengthComputable) {
                     const percent = Math.round((progress.loaded / progress.total) * 100);
                     if (percent % 25 === 0) { // Log every 25%
-                        console.log(`RealisticSun: Loading texture ${percent}%`);
+                        devLog.info(`RealisticSun: Loading texture ${percent}%`);
                     }
                 }
             },
             (error) => {
-                console.error('RealisticSun: Failed to load sun texture:', error);
-                console.log('RealisticSun: Continuing without texture (shader will use procedural effects)');
+                devLog.error('RealisticSun: Failed to load sun texture:', error);
+                devLog.warning('RealisticSun: Continuing without texture (shader will use procedural effects)');
                 // Don't set USE_MAP define - shader will work without texture
             }
         );
@@ -337,7 +346,7 @@ class RealisticSun {
         
         // Debug shader compilation
         if (sunShader.needsUpdate) {
-            console.log('RealisticSun: Shader compilation triggered');
+            devLog.info('RealisticSun: Shader compilation triggered');
         }
         
         this.group.add(this.sunCore);
@@ -848,11 +857,11 @@ class RealisticSun {
     // Adaptive quality based on distance
     setDistanceBasedQuality(distance) {
         if (!this.sunCore) return;
-        
+
         // Adjust geometry complexity based on distance
         if (distance > 10000) {
             // Very far - consider using lower poly geometry
-            if (this.sunCore.geometry.parameters.widthSegments > 32) {
+            if (this.sunCore.geometry.parameters?.widthSegments > 32) {
                 const lowPolyGeometry = new THREE.SphereGeometry(this.size, 32, 32);
                 this.sunCore.geometry.dispose();
                 this.sunCore.geometry = lowPolyGeometry;
