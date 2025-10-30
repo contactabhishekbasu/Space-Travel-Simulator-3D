@@ -306,10 +306,18 @@ class TimeControls {
         });
         
         goBtn.addEventListener('click', () => {
-            const selectedDate = new Date(input.value);
-            if (!isNaN(selectedDate)) {
+            try {
+                const selectedDate = new Date(input.value);
+                if (isNaN(selectedDate.getTime())) {
+                    console.error('TimeControls: Invalid date selected');
+                    alert('Please enter a valid date');
+                    return;
+                }
                 this.setDate(selectedDate);
                 modal.style.display = 'none';
+            } catch (error) {
+                console.error('TimeControls: Error parsing date:', error);
+                alert('Invalid date format');
             }
         });
     }

@@ -81,10 +81,12 @@ class CinematicCamera {
             this.camera.position.lerpVectors(startPosition, endPosition, easedProgress);
             
             // Update look at
-            if (typeof shot.lookAt === 'string' && window.bodies && window.bodies[shot.lookAt]) {
-                this.camera.lookAt(window.bodies[shot.lookAt].position);
-            } else if (shot.lookAt) {
-                this.camera.lookAt(shot.lookAt);
+            if (typeof this.camera.lookAt === 'function') {
+                if (typeof shot.lookAt === 'string' && window.bodies?.[shot.lookAt]?.position) {
+                    this.camera.lookAt(window.bodies[shot.lookAt].position);
+                } else if (shot.lookAt) {
+                    this.camera.lookAt(shot.lookAt);
+                }
             }
             
             if (progress < 1) {
@@ -114,10 +116,12 @@ class CinematicCamera {
             this.camera.position.copy(position);
             
             // Update look at
-            if (typeof shot.lookAt === 'string' && window.bodies && window.bodies[shot.lookAt]) {
-                this.camera.lookAt(window.bodies[shot.lookAt].position);
-            } else if (shot.lookAt) {
-                this.camera.lookAt(shot.lookAt);
+            if (typeof this.camera.lookAt === 'function') {
+                if (typeof shot.lookAt === 'string' && window.bodies?.[shot.lookAt]?.position) {
+                    this.camera.lookAt(window.bodies[shot.lookAt].position);
+                } else if (shot.lookAt) {
+                    this.camera.lookAt(shot.lookAt);
+                }
             }
             
             if (progress < 1) {

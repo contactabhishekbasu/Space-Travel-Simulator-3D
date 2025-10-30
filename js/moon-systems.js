@@ -259,13 +259,19 @@ class MoonSystems {
     }
     
     update(deltaTime, planetPositions, timeScale = 1) {
+        // Check if planetPositions is provided
+        if (!planetPositions) {
+            console.warn('MoonSystems: planetPositions not provided to update method');
+            return;
+        }
+
         // Performance optimization: Throttle updates
         const currentTime = performance.now();
         if (currentTime - this.lastUpdateTime < this.updateInterval) {
             return;
         }
         this.lastUpdateTime = currentTime;
-        
+
         // Get camera position for LOD calculations
         const cameraPos = window.camera ? window.camera.position : new THREE.Vector3();
         
@@ -279,7 +285,7 @@ class MoonSystems {
         
         for (let i = startIdx; i < endIdx; i++) {
             const [key, moon] = moonEntries[i];
-            const planetPos = planetPositions[moon.planetName];
+            const planetPos = planetPositions?.[moon.planetName];
             if (!planetPos) continue;
             
             // Distance-based LOD optimization

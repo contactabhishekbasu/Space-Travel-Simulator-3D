@@ -105,9 +105,13 @@ class SpacecraftTracker {
             }
         };
         
-            this.createSpacecraft().then(() => {
-                // this.createUI(); // Disabled - using navigation panel instead
-            });
+            this.createSpacecraft()
+                .then(() => {
+                    // this.createUI(); // Disabled - using navigation panel instead
+                })
+                .catch(error => {
+                    console.error('SpacecraftTracker: Failed to create spacecraft:', error);
+                });
             
             console.log('SpacecraftTracker: Initialization complete with', Object.keys(this.missions).length, 'missions');
             
