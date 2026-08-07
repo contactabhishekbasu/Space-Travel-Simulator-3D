@@ -50,3 +50,4 @@ Desktop.ini
 
 # Large files that exceed GitHub limits
 textures/spacecraft/James Webb Space Telescope/JWST_a1.mb
+.playwright-mcp/
